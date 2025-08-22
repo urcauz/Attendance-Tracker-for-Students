@@ -7,3 +7,7 @@
 - Formula for recovery streak: x ≥ 3·Held − 4·Attended.
 
 Here is A link for the project : https://attendance-tracker-for-students.vercel.app/
+
+Enjoy!
+
+- Cauz
