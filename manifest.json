@@ -1,14 +1,11 @@
 {
-  "name": "Attendance Tracker",
-  "short_name": "Attendance",
-  "start_url": "/",
+  "name": "Attendance Tracker for Students",
+  "short_name": "ATD",
+  "description": "A simple PWA Attendance Tracker for Students",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "orientation": "portrait",
-  "lang": "en",
-  "dir": "ltr",
-  "scope": "/",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -19,6 +16,12 @@
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
