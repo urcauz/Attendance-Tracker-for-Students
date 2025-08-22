@@ -1,23 +1,23 @@
 {
   "dir": "auto",
   "name": "Attendance Tracker",
+  "short_name": "ATD",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "display": "standalone",
-  "short_name": "ATD",
   "start_url": "https://attendance-tracker-for-students.vercel.app/?launchedfrom=homescreen",
   "scope": "https://attendance-tracker-for-students.vercel.app",
   "id": "https://attendance-tracker-for-students.vercel.app/64p9iZ1ApwWWw3zjcTWG",
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "https://pwa.xyz/AuymheL8mzE3smeNmmZZ%2FFCtWjQfHgRUSVBd.png?alt=media&amp;token=1808b36a-3a09-4ed6-bf22-708d53249d7f",
+      "src": "https://pwa.xyz/AuymheL8mzE3smeNmmZZ/FCtWjQfHgRUSVBd.png?alt=media&token=1808b36a-3a09-4ed6-bf22-708d53249d7f",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://pwa.xyz/AuymheL8mzE3smeNmmZZ%2FygkCoaoQQeaEwfz.png?alt=media&amp;token=f33becbd-28b5-4d18-9838-f61ec27fc7ea",
+      "src": "https://pwa.xyz/AuymheL8mzE3smeNmmZZ/ygkCoaoQQeaEwfz.png?alt=media&token=f33becbd-28b5-4d18-9838-f61ec27fc7ea",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -26,12 +26,11 @@
   "protocol_handlers": [
     {
       "protocol": "web+pwa",
-      "url": "https://attendance-tracker-for-students.vercel.app/?launchedfrom=homescreen&amp;pwaprotocolredirect=%s"
+      "url": "https://attendance-tracker-for-students.vercel.app/?launchedfrom=homescreen&pwaprotocolredirect=%s"
     },
     {
       "protocol": "web+attendancetracker",
-      "url": "https://attendance-tracker-for-students.vercel.app/?launchedfrom=homescreen&amp;pwaprotocolredirect=%s"
+      "url": "https://attendance-tracker-for-students.vercel.app/?launchedfrom=homescreen&pwaprotocolredirect=%s"
     }
   ]
-  
 }
