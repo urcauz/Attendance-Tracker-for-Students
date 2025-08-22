@@ -1,13 +1,12 @@
 {
-  "dir": "auto",
   "name": "Attendance Tracker",
   "short_name": "ATD",
+  "description": "Track your attendance easily with Attendance Tracker",
   "start_url": "/?launchedfrom=homescreen",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -20,16 +19,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+pwa",
-      "url": "/?launchedfrom=homescreen&pwaprotocolredirect=%s"
-    },
-    {
-      "protocol": "web+attendancetracker",
-      "url": "/?launchedfrom=homescreen&pwaprotocolredirect=%s"
     }
   ]
 }
