@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attendance Tracker - By Cauz</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#111824; --muted:#94a3b8; --text:#e6edf3; --accent:#22d3ee; --accent2:#a78bfa;
+      --good:#22c55e; --warn:#f59e0b; --bad:#ef4444; --border:#1f2937;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(1200px 800px at 100% -10%,rgba(167,139,250,.12),transparent),radial-gradient(1200px 800px at -10% 110%,rgba(34,211,238,.12),transparent),var(--bg);color:var(--text)}
+    .container{max-width:980px;margin:0 auto;padding:18px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{font-size:clamp(22px,3.8vw,32px);margin:8px 0;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.0));border:1px solid var(--border);border-radius:16px;padding:14px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .row + .row{margin-top:8px}
+    .label{color:var(--muted);font-size:12px}
+    .stat{font-weight:700}
+    .subject{font-weight:700;font-size:16px}
+    .btn{cursor:pointer;border:1px solid var(--border);background:#0e1622;color:var(--text);padding:8px 10px;border-radius:12px;font-weight:600}
+    .btn:hover{filter:brightness(1.08)}
+    .btn-group{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid var(--border);padding:6px 10px;font-size:12px}
+    .pill.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+    .pill.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
+    .pill.bad{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+    .tiny{font-size:11px;color:var(--muted)}
+    details{border:1px dashed var(--border);border-radius:12px;padding:10px;margin-top:14px}
+    summary{cursor:pointer;font-weight:700}
+    .footer{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .input{background:#0e1622;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px;width:100%}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .accent{color:var(--accent)}
+    .accent2{color:var(--accent2)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Attendance Tracker <span class="accent">• By Cauz</span></h1>
+        <div class="subtitle">Subjects: Physics, Chemistry, Maths, Electronics, English + Custom</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn" id="add-subject">+ Subject</button>
+        <button class="btn" id="export">Export</button>
+        <button class="btn" id="import">Import</button>
+        <button class="btn" id="reset-all" title="Clear all subjects & data">Reset</button>
+      </div>
+    </header>
+
+    <section class="card" aria-live="polite">
+      <div class="row">
+        <div>
+          <div class="label">Overall Attendance</div>
+          <div class="stat" id="overall">0%</div>
+        </div>
+        <div class="pill" id="overall-pill">OK</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="tiny">Target is <strong>75%</strong>. "Bunks left" = how many you can miss and still remain ≥ 75%. If below 75%, you'll see how many consecutive classes you must attend to recover.</div>
+      </div>
+    </section>
+
+    <div class="grid" id="grid"></div>
+
+    <details>
+      <summary>Tips • Read me</summary>
+      <ul class="tiny" style="margin:8px 0 0 16px;line-height:1.6">
+        <li>Tap <span class="accent2 mono">+ Attended</span> after a lecture you attended, or <span class="accent mono">+ Held</span> if the class happened but you missed it.</li>
+        <li>Use <strong>+ Both</strong> for classes you attended (adds +1 Held and +1 Attended together).</li>
+        <li>Data is saved automatically in your browser (localStorage). Export a backup JSON if you change phones.</li>
+        <li>Edit a subject name by clicking it. Reorder by dragging the handle (⋮⋮).</li>
+        <li>Formula for recovery streak: <span class="mono">x ≥ 3·Held − 4·Attended</span>.</li>
+      </ul>
+    </details>
+
+    <div class="footer tiny">
+      <span>Made for Students · Works offline.</span>
+      <span>Pro tip: Add this page to your phone's Home Screen.</span>
+    </div>
+  </div>
+
+  <template id="card-template">
+    <div class="card subject-card" draggable="true">
+      <div class="row">
+        <input class="subject input" />
+        <div class="pill" data-pill>OK</div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="label">Held</div>
+          <div class="stat mono" data-held>0</div>
+        </div>
+        <div>
+          <div class="label">Attended</div>
+          <div class="stat mono" data-attended>0</div>
+        </div>
+        <div>
+          <div class="label">%</div>
+          <div class="stat mono" data-pct>0%</div>
+        </div>
+      </div>
+      <div class="row btn-group" style="margin-top:10px">
+        <button class="btn" data-plus-both>+ Both</button>
+        <button class="btn" data-plus-held>+ Held</button>
+        <button class="btn" data-plus-attended>+ Attended</button>
+        <button class="btn" data-minus>Undo</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="tiny" data-extra></div>
+        <button class="btn" data-reset style="margin-left:auto">Reset</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+  (function(){
+    const TARGET = 0.75;
+    const LS_KEY = 'fyjc_attendance_v1';
+
+    /** @type {{subjects: {id:string,name:string,held:number,attended:number,history:Array<[string,number,number]>}[]} } */
+    let state = load() || {
+      subjects: [
+        {id:id(), name:'Physics', held:0, attended:0, history:[]},
+        {id:id(), name:'Chemistry', held:0, attended:0, history:[]},
+        {id:id(), name:'Maths', held:0, attended:0, history:[]},
+        {id:id(), name:'Electronics', held:0, attended:0, history:[]},
+        {id:id(), name:'English', held:0, attended:0, history:[]}
+      ]
+    };
+
+    const grid = document.getElementById('grid');
+    const overallEl = document.getElementById('overall');
+    const overallPill = document.getElementById('overall-pill');
+
+    function id(){return Math.random().toString(36).slice(2,9)}
+    function save(){localStorage.setItem(LS_KEY, JSON.stringify(state))}
+    function load(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'')}catch{return null}}
+
+    function pct(a,b){return b>0? (a/b*100):0}
+    function bunksLeft(att, held){return Math.floor(att/TARGET - held)}
+    function recoverNeeded(att, held){
+      const x = Math.ceil(Math.max(0, 3*held - 4*att));
+      return x;
+    }
+    function pillClass(p){
+      if (p >= 85) return 'pill good'
+      if (p >= 75) return 'pill warn'
+      return 'pill bad'
+    }
+    function pillText(p){
+      if (p >= 85) return 'Great'
+      if (p >= 75) return 'Safe'
+      return 'Low'
+    }
+
+    function render(){
+      grid.innerHTML='';
+      let totalHeld=0,totalAtt=0;
+      state.subjects.forEach(sub=>{
+        totalHeld += sub.held; totalAtt += sub.attended;
+        grid.appendChild(renderCard(sub));
+      });
+      const overallPct = pct(totalAtt,totalHeld);
+      overallEl.textContent = (overallPct||0).toFixed(1)+'%';
+      overallPill.className = pillClass(overallPct);
+      overallPill.textContent = pillText(overallPct);
+      save();
+      enableDrag();
+    }
+
+    function renderCard(sub){
+      const tpl = document.getElementById('card-template');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      const nameInput = node.querySelector('.subject');
+      const heldEl = node.querySelector('[data-held]');
+      const attEl = node.querySelector('[data-attended]');
+      const pctEl = node.querySelector('[data-pct]');
+      const pill = node.querySelector('[data-pill]');
+      const extra = node.querySelector('[data-extra]');
+
+      nameInput.value = sub.name;
+      nameInput.addEventListener('change',()=>{sub.name=nameInput.value.trim()||sub.name; render()});
+
+      function refreshStats(){
+        const p = pct(sub.attended, sub.held);
+        heldEl.textContent = sub.held;
+        attEl.textContent = sub.attended;
+        pctEl.textContent = (p||0).toFixed(1)+'%';
+        pill.className = pillClass(p);
+        pill.textContent = pillText(p);
+        const bunks = bunksLeft(sub.attended, sub.held);
+        if (p >= 75){
+          extra.textContent = `Bunks left: ${bunks}`;
+          extra.parentElement.querySelector('[data-reset]').style.marginLeft='auto';
+        } else {
+          const need = recoverNeeded(sub.attended, sub.held);
+          extra.textContent = `Below 75%. Attend next ${need} classes to recover.`;
+        }
+      }
+
+      function pushHistory(){
+        const today = new Date();
+        const stamp = today.toISOString().slice(0,10);
+        sub.history.push([stamp, sub.held, sub.attended]);
+        if (sub.history.length>200) sub.history.shift();
+      }
+
+      node.querySelector('[data-plus-both]').addEventListener('click',()=>{
+        sub.held++; sub.attended++; pushHistory(); render();
+      });
+      node.querySelector('[data-plus-held]').addEventListener('click',()=>{
+        sub.held++; pushHistory(); render();
+      });
+      node.querySelector('[data-plus-attended]').addEventListener('click',()=>{
+        if (sub.attended < sub.held){ sub.attended++; pushHistory(); render(); }
+        else { sub.held++; sub.attended++; pushHistory(); render(); }
+      });
+      node.querySelector('[data-minus]').addEventListener('click',()=>{
+        if (sub.held>0){
+          // try to undo last change sensibly
+          if (sub.attended>0){ sub.attended--; }
+          sub.held--;
+          pushHistory(); render();
+        }
+      });
+      node.querySelector('[data-reset]').addEventListener('click',()=>{
+        if (confirm(`Reset ${sub.name}?`)){
+          sub.held=0; sub.attended=0; sub.history=[]; render();
+        }
+      });
+
+      // attach id for drag sort
+      node.dataset.id = sub.id;
+      refreshStats();
+      return node;
+    }
+
+    // Drag & drop reordering
+    function enableDrag(){
+      const cards = Array.from(document.querySelectorAll('.subject-card'));
+      cards.forEach(card=>{
+        card.addEventListener('dragstart', e=>{
+          e.dataTransfer.setData('text/plain', card.dataset.id);
+        });
+        card.addEventListener('dragover', e=>{ e.preventDefault(); card.style.outline='1px dashed var(--accent2)';});
+        card.addEventListener('dragleave', ()=>{ card.style.outline='none';});
+        card.addEventListener('drop', e=>{
+          e.preventDefault(); card.style.outline='none';
+          const fromId = e.dataTransfer.getData('text/plain');
+          const toId = card.dataset.id;
+          const fromIdx = state.subjects.findIndex(s=>s.id===fromId);
+          const toIdx = state.subjects.findIndex(s=>s.id===toId);
+          if (fromIdx>-1 && toIdx>-1 && fromIdx!==toIdx){
+            const [moved] = state.subjects.splice(fromIdx,1);
+            state.subjects.splice(toIdx,0,moved);
+            render();
+          }
+        });
+      });
+    }
+
+    // Header controls
+    document.getElementById('add-subject').addEventListener('click',()=>{
+      const name = prompt('New subject name?','New Subject');
+      if (!name) return;
+      state.subjects.push({id:id(), name:name.trim(), held:0, attended:0, history:[]});
+      render();
+    });
+
+    document.getElementById('reset-all').addEventListener('click',()=>{
+      if (!confirm('Reset ALL subjects and data?')) return;
+      localStorage.removeItem(LS_KEY);
+      state = {subjects:[]};
+      render();
+    });
+
+    document.getElementById('export').addEventListener('click',()=>{
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), {href:url, download:'attendance-backup.json'});
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('import').addEventListener('click',()=>{
+      const input = document.createElement('input');
+      input.type='file'; input.accept='application/json';
+      input.onchange = async () => {
+        const file = input.files[0]; if (!file) return;
+        try{
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (!data.subjects) throw new Error('Invalid file');
+          state = data; save(); render();
+        }catch(e){ alert('Import failed: '+e.message); }
+      };
+      input.click();
+    });
+
+    // First paint
+    render();
+  })();
+  </script>
+</body>
+</html>
